@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Certificate — LMS FOR LEARNING</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="certificate.css" />
+</head>
+<body>
+  <nav class="top-nav">
+    <div class="nav-inner">
+      <h2 class="logo">LMS FOR LEARNING</h2>
+      <div class="nav-links">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="courses.html">Courses</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <section class="cert-intro">
+      <h1>Your Certificate</h1>
+      <p id="statusLine">Checking eligibility…</p>
+    </section>
+
+    <section class="cert-actions">
+      <div>
+        <button id="generateBtn" class="btn-primary">Generate Certificate (PDF)</button>
+        <button id="downloadBtn" class="btn-secondary" style="display:none">Download PDF</button>
+        <button id="emailBtn" class="btn-outline" style="display:none">Email Certificate</button>
+      </div>
+      <div class="cert-meta small" id="certMeta"></div>
+    </section>
+
+    <section class="cert-preview-wrap">
+      <div id="certPreview" class="cert-preview">
+        <!-- certificate canvas will be rendered here by html2canvas/jsPDF workflow -->
+        <div id="certificateCanvas" class="certificate-canvas" aria-hidden="true">
+          <!-- HTML template used for PDF render -->
+          <div class="cert-inner">
+            <div class="cert-header">
+              <img src="hero.png" alt="LMS FOR LEARNING" class="cert-logo" />
+            </div>
+            <div class="cert-body">
+              <h2>Certificate of Completion</h2>
+              <p class="cert-sub">This is to certify that</p>
+              <h1 id="certName">Student Name</h1>
+              <p class="cert-sub">has successfully completed the course</p>
+              <h3 id="certCourse">Course Name</h3>
+              <p class="cert-details">Issued on <span id="certDate">DATE</span></p>
+              <div class="cert-id">Certificate ID: <span id="certCode">—</span></div>
+            </div>
+            <div class="cert-footer">
+              <div class="signature">
+                <div class="sig-line">_______________________</div>
+                <div class="sig-name">Director, LMS FOR LEARNING</div>
+              </div>
+              <div class="verify-qr" id="certQR">
+                <!-- QR will be rendered here (img) -->
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- small message shown when PDF generated -->
+        <div id="previewMessage" class="small"></div>
+      </div>
+    </section>
+
+    <section style="margin-top:18px">
+      <p class="small">You can also verify a certificate at <a href="verify.html">Verify Certificate</a>.</p>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">© 2025 LMS FOR LEARNING</footer>
+
+  <!-- scripts: order matters -->
+  <script type="module" src="firebase.js"></script>
+  <script type="module" src="auth.js"></script>
+
+  <!-- libs for PDF generation & QR (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+
+  <script type="module" src="certificate.js"></script>
+</body>
+</html>

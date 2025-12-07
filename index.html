@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LMS — Home</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  
+
+
+<nav>
+  <h2 class="logo">LMS FOR LEARNING</h2>
+
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="courses.html">Courses</a>
+    <a href="videos.html">Videos</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="profile.html">Profile</a>
+    <a href="certificate.html">Certificate</a>
+    <a href="admin.html">Admin</a>
+    <a href="about.html">About us</a>
+    <a href="developer.html">Developer</a>
+    <a href="login.html">Login</a>
+     <a href="register.html">Sign up</a>
+      <a href="#" onclick="logout()">Logout</a>
+
+  </div>
+
+  <div class="nav-actions">
+    <button class="toggle-dark" onclick="toggleDarkMode()" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</nav>
+
+
+  <header class="hero" id="home">
+
+    <img src="hero.png" alt="Hero image" class="hero-img">
+    
+
+    <div class="hero-content">
+      <h1>Welcome to LMS FOR LEARNING</h1>
+      <p>Interactive learning platform — courses, videos, quizzes and certificates.</p>
+
+<div class="mx-auto flex max-w-sm items-center gap-x-4 rounded-xl bg-white p-6 shadow-lg outline outline-black/5 dark:bg-slate-800 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10">
+  <img class="size-12 shrink-0" src="/img/logo.svg" alt="" />
+  <div>
+    <div class="text-xl font-medium text-red dark:text-red">Click the blue button bellow to continue..</div>
+    <p class="text-red-500 dark:text-red-400">You have a new message!</p>
+  </div>
+</div>
+
+      </p>
+      <a class="btn" href="courses.html">CLICK HERE TO CONTINUE.....</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="features">
+      <article>
+        <h3>Curated Courses</h3>
+        <p>Structured courses with video lessons and quizzes.</p>
+      </article>
+      <article>
+        <h3>User Accounts</h3>
+        <p>Sign up and track progress across devices.</p>
+      </article>
+      <article>
+        <h3>Printable Certificates</h3>
+        <p>Complete all assignments,quizzes to get your certificate.</p>
+      </article>
+    </section>
+  </main>
+
+  <script type="module" src="firebase.js"></script>
+<script type="module" src="auth.js"></script>
+
+
+
+
+  <footer class="site-footer">
+    <p>&copy; @2025 LMS FOR LEARNING #festuserick4@gmail.com</p>
+  </footer>
+</body>
+</html>

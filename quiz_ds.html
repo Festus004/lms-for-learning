@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Quiz — Data Science</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+<nav>
+  <h2 class="logo">LMS FOR LEARNING</h2>
+  <div class="nav-links"><a href="course_datascience.html">Back to Course</a></div>
+  <button class="toggle-dark" onclick="toggleDarkMode()">🌙</button>
+
+</nav>
+
+<main class="container">
+  <h1>Data Science Quiz</h1>
+
+  <form id="quizDS" class="quiz-wrap" onsubmit="event.preventDefault(); gradeQuiz('quizDS','ds')">
+    <div class="question">
+      <h4>1. Which library is common for dataframes in Python?</h4>
+      <label><input type="radio" name="q1" value="a"> numpy</label><br>
+      <label><input type="radio" name="q1" value="b"> pandas</label><br>
+      <label><input type="radio" name="q1" value="c"> matplotlib</label>
+    </div>
+
+    <div class="question">
+      <h4>2. CSV stands for?</h4>
+      <label><input type="radio" name="q2" value="a"> Comma Separated Values</label><br>
+      <label><input type="radio" name="q2" value="b"> Computer Stored Values</label><br>
+      <label><input type="radio" name="q2" value="c"> Compressed Simple Values</label>
+    </div>
+
+    <div class="question">
+      <h4>3. Which is used for plots?</h4>
+      <label><input type="radio" name="q3" value="a"> pandas.plot()</label><br>
+      <label><input type="radio" name="q3" value="b"> matplotlib.pyplot</label><br>
+      <label><input type="radio" name="q3" value="c"> sklearn.plot()</label>
+    </div>
+
+    <button class="btn" type="submit">Submit Quiz</button>
+  </form>
+
+<form id="quizForm" class="quiz-wrap">
+  <div class="question">
+    <h4>1. Which tag describes a paragraph?</h4>
+    <label><input type="radio" name="q1" value="a"> &lt;p&gt;</label><br>
+    <label><input type="radio" name="q1" value="b"> &lt;div&gt;</label><br>
+    <label><input type="radio" name="q1" value="c"> &lt;span&gt;</label>
+  </div>
+
+  <div class="question">
+    <h4>2. CSS file extension?</h4>
+    <label><input type="radio" name="q2" value="a"> .html</label><br>
+    <label><input type="radio" name="q2" value="b"> .css</label><br>
+    <label><input type="radio" name="q2" value="c"> .js</label>
+  </div>
+
+  <div class="question">
+    <h4>3. JS method to add event?</h4>
+    <label><input type="radio" name="q3" value="a"> onEvent()</label><br>
+    <label><input type="radio" name="q3" value="b"> setListener()</label><br>
+    <label><input type="radio" name="q3" value="c"> addEventListener()</label>
+  </div>
+
+  <button class="btn" type="submit">Submit Quiz</button>
+</form>
+
+</main>
+</body>
+</html>

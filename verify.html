@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Verify Certificate</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="container" style="padding:40px 16px;">
+    <h1>Verify Certificate</h1>
+    <p>Enter certificate code to verify authenticity</p>
+
+    <div style="margin:14px 0;">
+      <input id="codeInput" placeholder="LMS-..." style="padding:10px;border-radius:8px;border:1px solid #ccc;width:320px;">
+      <button id="verifyBtn" class="btn-primary">Verify</button>
+    </div>
+
+    <div id="verifyResult" style="margin-top:20px;"></div>
+  </main>
+
+  <script type="module" src="firebase.js"></script>
+  <script type="module" src="verify.js"></script>
+</body>
+</html>

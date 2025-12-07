@@ -1,0 +1,52 @@
+/* certificate.css — modern minimal style B */
+
+.cert-intro { margin: 18px 0; }
+.cert-intro h1 { font-size: 24px; margin-bottom:6px; }
+.cert-intro p { color: #475569; }
+
+.cert-actions { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:14px; }
+.cert-actions .small { color:#6b7280; }
+
+.cert-preview-wrap { display:flex; justify-content:center; margin:18px 0; }
+.cert-preview { width:820px; max-width:95%; }
+
+.certificate-canvas {
+  background: linear-gradient(180deg,#ffffff,#f8fafc);
+  border: 12px solid #e6eef8;
+  border-radius: 8px;
+  padding: 28px;
+  box-shadow: 0 8px 30px rgba(2,6,23,0.12);
+  position: relative;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+.cert-inner { text-align:center; padding: 8px 16px; }
+
+.cert-logo { width:120px; opacity:0.95; margin-bottom:6px; }
+
+.cert-body h2 { font-size:22px; margin:6px 0; color:#0b3d91; }
+.cert-sub { margin:8px 0; color:#6b7280; }
+#certName { font-size:28px; margin:4px 0; color:#111827; }
+#certCourse { font-size:18px; margin:4px 0; color:#0b3d91; }
+.cert-details { color:#475569; margin-top:8px; }
+.cert-id { margin-top:12px; font-size:13px; color:#6b7280; }
+
+.cert-footer { display:flex; justify-content:space-between; align-items:center; margin-top:18px; }
+.signature { text-align:left; }
+.sig-line { color:#374151; font-weight:600; }
+.sig-name { font-size:13px; color:#6b7280; margin-top:4px; }
+
+.verify-qr img { width:90px; height:90px; border-radius:6px; box-shadow:0 4px 12px rgba(2,6,23,0.08); }
+
+/* buttons */
+.btn-primary { background:#0b3d91; color:#fff; padding:10px 14px; border-radius:8px; border:none; cursor:pointer; font-weight:600; }
+.btn-secondary { background:#0b1220; color:#fff; padding:10px 14px; border-radius:8px; border:none; cursor:pointer; font-weight:600; }
+.btn-outline { background:transparent; color:#0b3d91; padding:10px 14px; border-radius:8px; border:1px solid #0b3d91; cursor:pointer; font-weight:600; }
+
+/* small */
+.small { font-size:13px; color:#6b7280; }
+
+@media (max-width:900px) {
+  .certificate-canvas { padding:18px; border-width:8px; }
+  .cert-footer { flex-direction:column; gap:8px; align-items:center; }
+}

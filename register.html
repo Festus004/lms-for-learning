@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LMS — Register</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  
+<nav>
+  <h2 class="logo">LMS FOR LEARNING</h2>
+
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="courses.html">Courses</a>
+    <a href="videos.html">Videos</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="profile.html">Profile</a>
+    <a href="certificate.html">Certificate</a>
+    <a href="admin.html">Admin</a>
+    <a href="about.html">About</a>
+    <a href="developer.html">Developer</a>
+
+  </div>
+
+  <div class="nav-actions">
+    <button class="toggle-dark" onclick="toggleDarkMode()" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</nav>
+
+
+
+  <main class="auth">
+    <h2>Create Account</h2>
+    <form id="registerForm">
+      <label for="regName">Full Name</label>
+      <input id="regName" type="text" required>
+
+      <label for="regEmail">Email</label>
+      <input id="regEmail" type="email" required>
+
+      <label for="regPass">Password</label>
+      <input id="regPass" type="password" required>
+
+      <button class="btn" type="submit">Register</button>
+      <p class="muted">Already have an account? <a href="login.html">Login</a></p>
+    </form>
+  </main>
+<script type="module" src="firebase.js"></script>
+<script type="module" src="auth.js"></script>
+<script type="module" src="script.js"></script>
+
+
+
+
+<script type="module">
+  import { registerUser } from './auth.js';
+  // optionally expose to window for older invoked handlers:
+  window.registerUser = registerUser;
+</script>
+
+
+<script type="module">
+import { auth, db } from "./firebase.js";
+import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+const regForm = document.getElementById("registerForm");
+
+regForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById("regName").value.trim();
+    const email = document.getElementById("regEmail").value.trim();
+    const pass = document.getElementById("regPass").value;
+
+    try {
+        // Create account in Firebase Auth
+        const userCred = await createUserWithEmailAndPassword(auth, email, pass);
+
+        // Save profile to Firestore
+        await setDoc(doc(db, "users", userCred.user.uid), {
+            name: name,
+            email: email,
+            joined: serverTimestamp(),
+            progress: {},
+            scores: {}
+        });
+
+        alert("Account created successfully!");
+        window.location.href = "dashboard.html";
+    } catch (err) {
+        alert(err.message);
+    }
+});
+</script>
+<script type="module" src="firebase.js"></script>
+<script type="module" src="auth.js"></script>
+
+
+
+</body>
+<footer class="site-footer">
+    <p>&copy; 2025 LMS FOR LEARNING #festuserick4@gmail.com</p>
+</html>

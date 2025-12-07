@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Course — LMS FOR LEARNING</title>
+
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="course.css"/>
+</head>
+
+<body>
+
+  <nav class="top-nav">
+    <div class="nav-inner">
+      <h2 class="logo">LMS FOR LEARNING</h2>
+
+      <div class="nav-links">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="courses.html">Courses</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+
+    <section class="course-hero">
+      <div>
+        <h1 id="courseTitle">Loading…</h1>
+        <p id="courseDesc" class="course-desc">Loading course details…</p>
+      </div>
+
+      <div class="progress-badge">
+        <p id="progressBadge">Progress: 0%</p>
+      </div>
+    </section>
+
+    <div class="layout">
+      
+      <!-- VIDEO / QUIZ AREA -->
+      <div class="left-panel">
+
+        <div class="video-box">
+          <iframe id="videoFrame" class="video-frame" src="" allowfullscreen></iframe>
+
+          <div class="video-footer">
+            <button id="markCompleteBtn" class="btn-primary">Mark Lesson Complete</button>
+            <div id="lessonTitle" class="lesson-current-title"></div>
+          </div>
+        </div>
+
+        <div class="quiz-box">
+          <div class="quiz-left">
+            <strong>Quiz</strong>
+            <p class="small">Complete the quiz to earn course progress.</p>
+          </div>
+
+          <a id="quizLink" class="btn-warning" href="#">Take Quiz</a>
+        </div>
+
+      </div>
+
+      <!-- LESSONS SIDEBAR -->
+      <aside class="lesson-list">
+        <p class="small lessons-title">Lessons</p>
+        <div id="lessonsContainer" class="lessons-container">
+          Loading lessons…
+        </div>
+      </aside>
+
+    </div>
+
+  </main>
+
+  <footer class="site-footer">© 2025 LMS FOR LEARNING</footer>
+
+  <!-- Firebase -->
+  <script type="module" src="firebase.js"></script>
+  <script type="module" src="auth.js"></script>
+  <script type="module" src="script.js"></script>
+  <script type="module" src="course.js"></script>
+
+</body>
+</html>
