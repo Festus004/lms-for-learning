@@ -1,52 +1,124 @@
-/* certificate.css — modern minimal style B */
+/* certificate.css — Premium Navy & Gold Structure */
 
-.cert-intro { margin: 18px 0; }
-.cert-intro h1 { font-size: 24px; margin-bottom:6px; }
-.cert-intro p { color: #475569; }
+.cert-preview-wrap { 
+    display: flex; 
+    justify-content: center; 
+    margin: 30px 0; 
+}
 
-.cert-actions { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:14px; }
-.cert-actions .small { color:#6b7280; }
+/* Actions Bar */
+.cert-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
 
-.cert-preview-wrap { display:flex; justify-content:center; margin:18px 0; }
-.cert-preview { width:820px; max-width:95%; }
-
+/* MAIN CANVAS (800x600) */
 .certificate-canvas {
-  background: linear-gradient(180deg,#ffffff,#f8fafc);
-  border: 12px solid #e6eef8;
-  border-radius: 8px;
-  padding: 28px;
-  box-shadow: 0 8px 30px rgba(2,6,23,0.12);
-  position: relative;
-  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    width: 800px;
+    height: 600px;
+    background: #ffffff;
+    border: 15px solid #0a1d37; /* Navy Border */
+    padding: 5px;
+    position: relative;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
 }
 
-.cert-inner { text-align:center; padding: 8px 16px; }
-
-.cert-logo { width:120px; opacity:0.95; margin-bottom:6px; }
-
-.cert-body h2 { font-size:22px; margin:6px 0; color:#0b3d91; }
-.cert-sub { margin:8px 0; color:#6b7280; }
-#certName { font-size:28px; margin:4px 0; color:#111827; }
-#certCourse { font-size:18px; margin:4px 0; color:#0b3d91; }
-.cert-details { color:#475569; margin-top:8px; }
-.cert-id { margin-top:12px; font-size:13px; color:#6b7280; }
-
-.cert-footer { display:flex; justify-content:space-between; align-items:center; margin-top:18px; }
-.signature { text-align:left; }
-.sig-line { color:#374151; font-weight:600; }
-.sig-name { font-size:13px; color:#6b7280; margin-top:4px; }
-
-.verify-qr img { width:90px; height:90px; border-radius:6px; box-shadow:0 4px 12px rgba(2,6,23,0.08); }
-
-/* buttons */
-.btn-primary { background:#0b3d91; color:#fff; padding:10px 14px; border-radius:8px; border:none; cursor:pointer; font-weight:600; }
-.btn-secondary { background:#0b1220; color:#fff; padding:10px 14px; border-radius:8px; border:none; cursor:pointer; font-weight:600; }
-.btn-outline { background:transparent; color:#0b3d91; padding:10px 14px; border-radius:8px; border:1px solid #0b3d91; cursor:pointer; font-weight:600; }
-
-/* small */
-.small { font-size:13px; color:#6b7280; }
-
-@media (max-width:900px) {
-  .certificate-canvas { padding:18px; border-width:8px; }
-  .cert-footer { flex-direction:column; gap:8px; align-items:center; }
+.cert-inner {
+    border: 2px solid #c5a059; /* Gold Border */
+    height: 100%;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ffffff;
+    position: relative;
 }
+
+/* Gold Corners */
+.corner-decoration {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border: 4px solid #c5a059;
+}
+.top-left { top: -2px; left: -2px; border-right: 0; border-bottom: 0; }
+.top-right { top: -2px; right: -2px; border-left: 0; border-bottom: 0; }
+.bottom-left { bottom: -2px; left: -2px; border-right: 0; border-top: 0; }
+.bottom-right { bottom: -2px; right: -2px; border-left: 0; border-top: 0; }
+
+.cert-header { text-align: center; }
+.cert-logo { height: 50px; margin-bottom: 10px; }
+.cert-title-gold { color: #c5a059; letter-spacing: 4px; font-weight: 700; font-size: 11px; }
+
+.cert-body { text-align: center; width: 100%; }
+.cert-main-title { font-size: 22px; letter-spacing: 2px; color: #0a1d37; font-weight: 800; margin: 10px 0; }
+.cert-sub { font-style: italic; color: #64748b; font-size: 16px; }
+
+#certName {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px;
+    color: #0a1d37;
+    margin: 10px 0;
+    border-bottom: 1px solid #c5a059;
+    padding: 0 40px;
+    display: inline-block;
+}
+
+#certCourse { font-size: 26px; color: #0a1d37; font-weight: 700; margin-top: 10px; }
+.cert-details { color: #64748b; margin-top: 8px; font-size: 14px; }
+
+/* FOOTER - Signatures and QR aligned correctly */
+.cert-footer {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.signature-block {
+    text-align: center;
+    width: 210px;
+}
+
+.signature-handwritten {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: #0a1d37;
+    margin-bottom: 2px;
+}
+
+.sig-line { border-top: 1px solid #0a1d37; width: 100%; margin-bottom: 5px; }
+.sig-name { font-size: 10px; text-transform: uppercase; color: #94a3b8; letter-spacing: 1px; }
+
+/* QR VAULT (Perfectly Centered) */
+.qr-vault {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.verify-qr canvas {
+    width: 80px !important;
+    height: 80px !important;
+    border: 1px solid #c5a059;
+    padding: 5px;
+    background: #fff;
+}
+
+.cert-id-box { font-family: monospace; font-size: 10px; color: #94a3b8; margin-top: 8px; }
+
+/* Buttons */
+.btn-primary { background: #0a1d37; color: #fff; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+.btn-secondary { background: #c5a059; color: #fff; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+.btn-outline { background: transparent; border: 2px solid #0a1d37; color: #0a1d37; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+
+.btn-primary:hover { background: #162e4e; }
+.btn-outline:hover { background: #0a1d37; color: #fff; }

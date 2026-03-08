@@ -1,50 +1,98 @@
-// verify.js
-import { db } from "./firebase.js";
-import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+// verify.js - Public verification logic for NextGen-LMS
+const API_BASE_URL = 'http://localhost:5001/api';
 
-const codeInput = document.getElementById("codeInput");
 const verifyBtn = document.getElementById("verifyBtn");
-const result = document.getElementById("verifyResult");
+const codeInput = document.getElementById("codeInput");
+const resultCard = document.getElementById("verifyResult");
+const statusMsg = document.getElementById("statusMessage");
 
-async function verifyCode(code) {
-  result.innerHTML = "Checking…";
-  try {
-    const q = query(collection(db, "certificates"), where("certificateCode", "==", code));
-    const snap = await getDocs(q);
-    if (snap.empty) {
-      result.innerHTML = `<p class="small">Certificate not found or invalid code.</p>`;
-      return;
+// Result Fields
+const resStudent = document.getElementById("resStudent");
+const resCourse = document.getElementById("resCourse");
+const resDate = document.getElementById("resDate");
+const resId = document.getElementById("resId");
+
+/**
+ * Main verification function
+ */
+async function performVerification(code) {
+    // Basic validation: ignore empty or tiny inputs
+    if (!code || code.trim().length < 5) {
+        statusMsg.textContent = "Please enter a valid certificate code.";
+        statusMsg.style.color = "#ef4444";
+        return;
     }
-    // assume first match
-    const docSnap = snap.docs[0];
-    const data = docSnap.data();
-    const issued = data.issuedAt && data.issuedAt.toDate ? data.issuedAt.toDate().toLocaleDateString() : data.issuedAt || 'N/A';
-    result.innerHTML = `
-      <div style="padding:12px;border-radius:8px;background:#f6f8fa;">
-        <h3>Certificate Verified</h3>
-        <p><strong>Name:</strong> ${data.studentName}</p>
-        <p><strong>Course:</strong> ${data.courseName}</p>
-        <p><strong>Issued:</strong> ${issued}</p>
-        <p><strong>Certificate ID:</strong> ${data.certificateCode}</p>
-        <p><a href="${data.pdfUrl}" target="_blank">Open certificate PDF</a></p>
-      </div>
-    `;
-  } catch (err) {
-    console.error(err);
-    result.innerHTML = "<p class='small'>Error checking certificate. See console.</p>";
-  }
+
+    const cleanCode = code.trim().toUpperCase();
+
+    // Reset UI for new search
+    resultCard.style.display = "none";
+    resultCard.classList.remove("error-card");
+    statusMsg.textContent = "🔍 Searching secure records...";
+    statusMsg.style.color = "#64748b";
+    verifyBtn.disabled = true;
+
+    try {
+        // GET request to public verification route
+        const res = await fetch(`${API_BASE_URL}/certificates/verify/${cleanCode}`);
+        const data = await res.json();
+
+        if (!res.ok) {
+            throw new Error(data.message || "Credential not found in our records.");
+        }
+
+        // --- SUCCESS STATE ---
+        statusMsg.textContent = "";
+        resultCard.style.display = "block";
+        
+        // Populate fields with data from MongoDB
+        resStudent.textContent = data.certificate.studentName;
+        resCourse.textContent = data.certificate.courseName;
+        resDate.textContent = new Date(data.certificate.issuedAt).toLocaleDateString('en-GB', {
+            day: 'numeric', month: 'long', year: 'numeric'
+        });
+        resId.textContent = data.certificate.certificateCode;
+
+    } catch (err) {
+        // --- ERROR STATE ---
+        statusMsg.textContent = "";
+        resultCard.style.display = "block";
+        resultCard.classList.add("error-card");
+        
+        // Using innerHTML here carefully to show a clear failure UI
+        resultCard.innerHTML = `
+            <div class="verify-badge" style="background:#ef4444; color:white; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:bold; display:inline-block;">✕ INVALID</div>
+            <h2 style="margin:10px 0; color: #1e293b;">Verification Failed</h2>
+            <p style="color:#64748b;">The code <strong>${cleanCode}</strong> could not be verified.</p>
+            <p style="font-size: 13px; color:#ef4444;">Reason: ${err.message}</p>
+        `;
+    } finally {
+        verifyBtn.disabled = false;
+    }
 }
 
+// Event: Button Click
 verifyBtn.addEventListener("click", () => {
-  const code = codeInput.value.trim();
-  if (!code) return alert("Enter code");
-  verifyCode(code);
+    performVerification(codeInput.value);
 });
 
-// also support ?code=... in URL
-const urlParams = new URLSearchParams(window.location.search);
-const c = urlParams.get("code");
-if (c) {
-  codeInput.value = c;
-  verifyCode(c);
-}
+// Event: Enter Key support for better UX
+codeInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+        performVerification(codeInput.value);
+    }
+});
+
+/**
+ * Auto-run if code is in URL (Perfect for QR code scans)
+ * Example URL: verify.html?code=LMS-ABCD-1234
+ */
+document.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(window.location.search);
+    const codeFromUrl = params.get("code") || params.get("id");
+    
+    if (codeFromUrl) {
+        codeInput.value = codeFromUrl;
+        performVerification(codeFromUrl);
+    }
+});

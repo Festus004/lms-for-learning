@@ -1,41 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your Profile</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="script.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Profile – LMS FOR LEARNING</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="ui.js" defer></script>
+    <script src="auth.js" type="module"></script>
+    
+    <style>
+        .profile-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        .profile-box {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .progress-wrap {
+            background: #eee;
+            border-radius: 10px;
+            height: 20px;
+            width: 100%;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-bar {
+            background: #28a745;
+            height: 100%;
+            width: 0%; /* Updated by JS */
+            transition: width 0.5s ease-in-out;
+        }
+        .course-card {
+            border-left: 5px solid #007bff;
+            padding: 15px;
+            background: #f8f9fa;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
 
 <nav>
-  <h2 class="logo">LMS FOR LEARNING</h2>
-  <div class="nav-links">
-    <a href="index.html">Home</a>
-    <a href="dashboard.html">Dashboard</a>
-    <a href="courses.html">Courses</a>
-    <a href="profile.html">Profile</a>
-    <a href="#" onclick="logout()">Logout</a>
-  </div>
-  <button class="toggle-dark" onclick="toggleDarkMode()">🌙</button>
-
+    <h2 class="logo">LMS FOR LEARNING</h2>
+    <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="courses.html">Courses</a>
+        <a href="profile.html" aria-current="page">Profile</a>
+        <button type="button" id="logoutBtn" style="background:none; border:none; color:white; cursor:pointer; font-size:1rem;">Logout</button>
+    </div>
+    <button class="toggle-dark" onclick="toggleDarkMode()" aria-label="Toggle dark mode" id="themeToggle">🌙</button>
 </nav>
 
-<main class="container">
-  <h1>Your Profile</h1>
+<main class="profile-container">
+    <header>
+        <h1>Your Profile</h1>
+    </header>
 
-  <div class="profile-box">
-    <p><strong>Name:</strong> <span id="profileName"></span></p>
-    <p><strong>Email:</strong> <span id="profileEmail"></span></p>
-    <p><strong>Member Since:</strong> <span id="joinedDate"></span></p>
-    <div style="margin-top:12px;">
-      <h4>Course Progress (Web Dev)</h4>
-      <div class="progress-wrap"><div class="progress-bar" style="width:0%"></div></div>
-      <div id="userProgress" style="margin-top:6px;">Progress: <span id="progPercent">0%</span></div>
-    </div>
-  </div>
+    <section class="profile-box">
+        <h3>Account Details</h3>
+        <hr>
+        <p><strong>Name:</strong> <span id="profileName">Loading...</span></p>
+        <p><strong>Email:</strong> <span id="profileEmail">Loading...</span></p>
+        <p><strong>Member Since:</strong> <span id="joinedDate">Loading...</span></p>
+    </section>
+
+    <section class="profile-box">
+        <h3>My Learning Progress</h3>
+        <div id="enrolledCoursesContainer">
+            <div class="course-card">
+                <h4 id="activeCourseTitle">Overall Learning Path</h4>
+                <div class="progress-wrap" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                    <div id="profileProgressBar" class="progress-bar"></div>
+                </div>
+                <p id="userProgressText">Completion: <span id="progPercent">0%</span></p>
+            </div>
+        </div>
+    </section>
 </main>
 
+<script>
+    // Simple logout helper if not handled in auth.js
+    document.getElementById('logoutBtn')?.addEventListener('click', () => {
+        localStorage.removeItem('token');
+        window.location.href = 'login.html';
+    });
+</script>
+<script type="module" src="profile.js"></script>
 </body>
 </html>

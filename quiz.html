@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Assessment | LMS</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f9; margin: 0; padding: 20px; }
+        .quiz-container { max-width: 800px; margin: 40px auto; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .quiz-header { border-bottom: 2px solid #f1f5f9; margin-bottom: 20px; padding-bottom: 10px; }
+        #quizTitle { color: #0b3d91; margin-bottom: 5px; }
+        
+        /* Button Styles */
+        .btn-primary, .btn-green { 
+            background: #0b3d91; color: white; border: none; padding: 12px 25px; 
+            border-radius: 5px; cursor: pointer; font-weight: 600; transition: 0.3s;
+        }
+        .btn-green { background: #10b981; }
+        .btn-primary:hover, .btn-green:hover { opacity: 0.9; transform: translateY(-1px); }
+        
+        /* Result Area */
+        #resultArea { text-align: center; display: none; padding: 20px; }
+        
+        /* Quiz Option Styles - Crucial for the JS to look right */
+        .option-item {
+            padding: 14px; 
+            border: 1px solid #e2e8f0; 
+            margin: 10px 0; 
+            cursor: pointer; 
+            border-radius: 8px; 
+            transition: all 0.2s ease; 
+            font-weight: 500;
+            background: white;
+        }
+        .option-item:hover { 
+            background: #f8fafc; 
+            border-color: #cbd5e1; 
+        }
+        .question-card {
+            margin-bottom: 25px; 
+            padding: 25px; 
+            background: white; 
+            border-radius: 12px; 
+            border: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <div id="quizContentWrapper">
+            <div class="quiz-header">
+                <h2 id="quizTitle">Final Assessment</h2>
+                <p id="courseNameDisplay">Loading course details...</p>
+            </div>
+
+            <div id="quizContent"></div>
+
+            <div style="margin-top: 30px; text-align: right;">
+                <button id="submitQuiz" class="btn-primary" style="display: none;">Submit Assessment</button>
+            </div>
+        </div>
+
+        <div id="resultArea">
+            <h2 id="scoreText">Your Score: 0%</h2>
+            <p id="feedbackText"></p>
+            
+            <div id="certAction" style="display: none; margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px;">
+                <h3>Congratulations!</h3>
+                <p>You have successfully passed this course.</p>
+                <button id="downloadCertBtn" class="btn-green">Claim My Certificate</button>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <a href="dashboard.html" style="color: #64748b; text-decoration: none; font-weight: 600;">Return to Dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="quiz.js"></script>
+</body>
+</html>

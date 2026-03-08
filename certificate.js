@@ -1,264 +1,223 @@
-// certificate.js
-import { auth, db, storage } from "./firebase.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-import {
-  doc,
-  getDoc,
-  setDoc,
-  addDoc,
-  collection,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-import { ref as storageRef, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js";
-import { httpsCallable, getFunctions } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-functions.js";
+const API_BASE_URL = 'http://localhost:5001/api';
 
-// html2canvas & jspdf are global via CDN; use them via window.html2canvas and jspdf
-const generateBtn = document.getElementById("generateBtn");
-const downloadBtn = document.getElementById("downloadBtn");
-const emailBtn = document.getElementById("emailBtn");
-const statusLine = document.getElementById("statusLine");
-const certMeta = document.getElementById("certMeta");
+document.addEventListener("DOMContentLoaded", () => {
+    checkEligibilityAndLoad();
+    
+    // Core Event Listeners
+    document.getElementById("generateBtn").addEventListener("click", handleGenerate);
+    document.getElementById("downloadBtn").addEventListener("click", downloadPDF);
+    document.getElementById("emailBtn").addEventListener("click", handleEmailResend);
+});
 
-let currentUser = null;
-let currentCourseId = null;
-let currentCourseName = null;
-let certificateDoc = null; // Firestore doc data if exists
-let lastPdfDataUrl = null;
-let lastCertId = null;
-
-// simple unique code generator
-function makeCertCode() {
-  const now = Date.now().toString(36).toUpperCase();
-  const rand = Math.random().toString(36).slice(2,8).toUpperCase();
-  return `LMS-${now}-${rand}`;
-}
-
-// render certificate DOM with user & course info
-function fillCertificateTemplate(name, course, issueDate, code) {
-  document.getElementById("certName").textContent = name;
-  document.getElementById("certCourse").textContent = course;
-  document.getElementById("certDate").textContent = issueDate;
-  document.getElementById("certCode").textContent = code;
-}
-
-// create QR (data URL) using QRious
-function createQRCode(url) {
-  const qr = new QRious({
-    value: url,
-    size: 160,
-    level: 'M'
-  });
-  return qr.toDataURL();
-}
-
-// convert the certificate DOM to a high-res PDF (A4 landscape-ish)
-async function exportCertificatePdf() {
-  const el = document.getElementById("certificateCanvas");
-
-  // use html2canvas for screenshot
-  const canvas = await html2canvas(el, { scale: 2, useCORS: true });
-  const imgData = canvas.toDataURL("image/png");
-
-  const { jsPDF } = window.jspdf;
-  // A4 landscape
-  const pdf = new jsPDF({
-    orientation: "landscape",
-    unit: "pt",
-    format: "a4"
-  });
-  // compute image size to fit page
-  const pageWidth = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
-
-  // draw image
-  pdf.addImage(imgData, 'PNG', 20, 20, pageWidth - 40, pageHeight - 40);
-  const dataUrl = pdf.output('datauristring');
-  return { dataUrl, blob: pdf.output('blob'), pdf };
-}
-
-// upload base64/pdf to Firebase Storage and return URL
-async function uploadPdfToStorage(uid, certCode, dataUrl) {
-  // store under /certificates/{uid}/{certCode}.pdf
-  const path = `certificates/${uid}/${certCode}.pdf`;
-  const ref = storageRef(storage, path);
-  // dataUrl is a data:application/pdf;base64,....
-  // uploadString expects 'data_url' format
-  await uploadString(ref, dataUrl, 'data_url');
-  const url = await getDownloadURL(ref);
-  return url;
-}
-
-// save certificate metadata to Firestore
-async function saveCertificateRecord(uid, certCode, courseId, courseName, studentName, pdfUrl, score) {
-  const payload = {
-    uid,
-    certificateCode: certCode,
-    courseId,
-    courseName,
-    studentName,
-    pdfUrl,
-    score: score || null,
-    issuedAt: serverTimestamp()
-  };
-  // add doc to collection certificates (doc id will be auto)
-  const docRef = await addDoc(collection(db, "certificates"), payload);
-  return { id: docRef.id, ...payload };
-}
-
-// check eligibility (progress >=100) and load existing certificate if any
+/**
+ * Loads the certificate state: Public Verify, Eligible to Generate, or Already Issued
+ */
 async function checkEligibilityAndLoad() {
-  statusLine.textContent = "Checking your certificate eligibility…";
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-      statusLine.textContent = "Please log in to generate or download certificates.";
-      generateBtn.disabled = true;
-      return;
-    }
-    currentUser = user;
-    // Determine courseId from query param ?course=courseId or from localStorage fallback
-    const params = new URLSearchParams(location.search);
-    currentCourseId = params.get("course") || params.get("courseId") || localStorage.getItem("currentCourseId");
-    if (!currentCourseId) {
-      statusLine.textContent = "No course specified. Open certificate from course page.";
-      generateBtn.disabled = true;
-      return;
-    }
+    const statusLine = document.getElementById("statusLine");
+    const generateBtn = document.getElementById("generateBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const emailBtn = document.getElementById("emailBtn");
 
-    // Load user's progress for this course
-    const uRef = doc(db, "users", user.uid);
-    const uSnap = await getDoc(uRef);
-    if (!uSnap.exists()) {
-      statusLine.textContent = "User profile not found in database.";
-      generateBtn.disabled = true;
-      return;
-    }
-    const ud = uSnap.data();
-    currentCourseName = (ud.courseNames && ud.courseNames[currentCourseId]) || currentCourseId;
+    const params = new URLSearchParams(window.location.search);
+    const certCodeParam = params.get("code"); 
+    // Get ID from URL or fallback to LocalStorage
+    const courseId = params.get("id") || params.get("courseId") || localStorage.getItem("currentCourseId");
+    const token = localStorage.getItem('token');
 
-    const progress = ud.progress && ud.progress[currentCourseId] ? ud.progress[currentCourseId] : 0;
-    // attempt to find existing certificate record for this user & course
-    const certsSnap = await getDocs(collection(db, "certificates"));
-    let found = null;
-    certsSnap.forEach(s => {
-      const c = s.data();
-      if (c.uid === user.uid && c.courseId === currentCourseId) {
-        found = { id: s.id, ...c };
-      }
+    try {
+        // --- MODE 1: Public Verification Link (No login required) ---
+        if (certCodeParam) {
+            const res = await fetch(`${API_BASE_URL}/certificates/verify/${certCodeParam}`);
+            const data = await res.json();
+            if (res.ok) {
+                renderCertToUI(data.certificate);
+                statusLine.textContent = "Verified Official Certificate.";
+                return; 
+            }
+        }
+
+        // --- MODE 2: Student Dashboard View (Login required) ---
+        if (!token) {
+            statusLine.textContent = "Please log in to view your certificate.";
+            return;
+        }
+
+        if (!courseId) {
+            statusLine.textContent = "No course selected. Return to dashboard.";
+            return;
+        }
+
+        // We use the /check endpoint which now checks both Lesson Progress AND Quiz Score
+        const res = await fetch(`${API_BASE_URL}/certificates/check/${courseId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+
+        if (data.certificate) {
+            // SCENARIO A: Certificate already exists in Database
+            renderCertToUI(data.certificate);
+            statusLine.textContent = "Your official certificate is ready.";
+            downloadBtn.style.display = "inline-block";
+            emailBtn.style.display = "inline-block"; 
+            
+        } else if (data.isEligible) {
+            // SCENARIO B: Lessons 100% AND Quiz Passed (Eligible to Generate)
+            statusLine.textContent = "Congratulations! You are eligible.";
+            generateBtn.style.display = "inline-block";
+            
+            // Preview data onto the template before user clicks Generate
+            document.getElementById("certName").textContent = data.registeredName || localStorage.getItem('userName') || "Student";
+            document.getElementById("certCourse").textContent = localStorage.getItem("currentCourseTitle") || "Course Completed";
+            document.getElementById("certDate").textContent = new Date().toLocaleDateString();
+            document.getElementById("certCode").textContent = "PENDING";
+            
+        } else {
+            // SCENARIO C: Not finished or Quiz not passed
+            statusLine.textContent = data.message || `Requirement not met. Ensure lessons are 100% and Quiz is passed.`;
+            
+            // If they aren't eligible, show a "Back to Course" button after 1 second
+            setTimeout(() => {
+                if (!data.isEligible && !data.certificate) {
+                    // FIXED: Redirecting to course-details.html (plural)
+                    statusLine.innerHTML += `<br><a href="course-details.html?id=${courseId}" style="color:#0b3d91; font-weight:bold;">Return to Course</a>`;
+                }
+            }, 1000);
+        }
+
+    } catch (err) {
+        console.error("Load Error:", err);
+        statusLine.textContent = "Connection error. Ensure server is running.";
+    }
+}
+
+/**
+ * Renders data into the Certificate Template UI
+ */
+function renderCertToUI(cert) {
+    document.getElementById("certName").textContent = cert.studentName;
+    document.getElementById("certCourse").textContent = cert.courseName;
+    document.getElementById("certCode").textContent = cert.certificateCode;
+    
+    const issueDate = cert.createdAt ? new Date(cert.createdAt) : new Date();
+    document.getElementById("certDate").textContent = issueDate.toLocaleDateString('en-US', {
+        year: 'numeric', month: 'long', day: 'numeric'
     });
 
-    if (found) {
-      certificateDoc = found;
-      lastCertId = found.certificateCode || found.certificateCode || found.certificateCode;
-      statusLine.textContent = `Certificate already issued on ${found.issuedAt?.toDate ? found.issuedAt.toDate().toLocaleDateString() : 'date'}.`;
-      downloadBtn.style.display = "inline-block";
-      emailBtn.style.display = "inline-block";
-      generateBtn.style.display = "none";
-      fillCertificateTemplate(found.studentName, found.courseName, found.issuedAt?.toDate ? found.issuedAt.toDate().toLocaleDateString() : new Date().toLocaleDateString(), found.certificateCode || found.certificateCode || '—');
-      // get download url if exists
-      certMeta.innerText = `Certificate ID: ${found.certificateCode || '—'}`;
-      return;
+    // Generate QR Code for Verification
+    const qrContainer = document.getElementById('certQR');
+    if (qrContainer) {
+        qrContainer.innerHTML = ""; 
+        new QRious({
+            element: qrContainer.appendChild(document.createElement('canvas')),
+            value: `${window.location.origin}/certificate.html?code=${cert.certificateCode}`,
+            size: 100,
+            level: 'H'
+        });
     }
-
-    // not found -> check eligibility
-    if (progress >= 100) {
-      statusLine.textContent = "You are eligible to generate a certificate. Click Generate Certificate.";
-      generateBtn.disabled = false;
-      generateBtn.style.display = "inline-block";
-    } else {
-      statusLine.textContent = `Course progress: ${progress}%. You need 100% to generate certificate.`;
-      generateBtn.disabled = true;
-    }
-  });
 }
 
-// hookup UI
-generateBtn.addEventListener("click", async () => {
-  if (!currentUser) { alert("Login first."); return; }
-  generateBtn.disabled = true;
-  statusLine.textContent = "Generating certificate…";
+/**
+ * Captures the HTML as an image, converts to PDF, and saves to Database
+ */
+async function handleGenerate() {
+    const token = localStorage.getItem('token');
+    const courseId = localStorage.getItem("currentCourseId");
+    const courseTitle = localStorage.getItem("currentCourseTitle") || "Course Completed";
+    const generateBtn = document.getElementById("generateBtn");
 
-  // prepare cert info
-  const studentName = currentUser.displayName || (await getDoc(doc(db, "users", currentUser.uid))).data().name || currentUser.email;
-  const courseName = currentCourseName || currentCourseId;
-  const issueDate = new Date().toLocaleDateString();
-  const certCode = makeCertCode();
+    if (!courseId) return alert("Course ID missing.");
 
-  // fill the template DOM
-  fillCertificateTemplate(studentName, courseName, issueDate, certCode);
+    generateBtn.disabled = true;
+    generateBtn.textContent = "⌛ Securing & Saving...";
 
-  try {
-    // render to PDF
-    const { dataUrl } = await exportCertificatePdf(); // dataUrl is datauristring
-    lastPdfDataUrl = dataUrl;
+    try {
+        const element = document.getElementById("certificateCanvas");
+        // Using scale 1.5 for the perfect balance of quality and DB storage limits
+        const canvas = await html2canvas(element, { scale: 1.5, useCORS: true });
+        const imgData = canvas.toDataURL("image/png");
+        
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF("l", "px", [800, 600]);
+        pdf.addImage(imgData, "PNG", 0, 0, 800, 600);
+        const pdfBase64 = pdf.output('datauristring');
 
-    // upload to storage
-    statusLine.textContent = "Uploading certificate to server…";
-    const pdfUrl = await uploadPdfToStorage(currentUser.uid, certCode, dataUrl);
+        const res = await fetch(`${API_BASE_URL}/certificates/generate`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` 
+            },
+            body: JSON.stringify({ 
+                courseId: courseId, 
+                courseName: courseTitle, 
+                pdfData: pdfBase64 
+            })
+        });
 
-    // save Firestore record
-    statusLine.textContent = "Saving certificate metadata…";
-    const rec = await saveCertificateRecord(currentUser.uid, certCode, currentCourseId, courseName, studentName, pdfUrl, null);
-    certificateDoc = rec;
-    lastCertId = certCode;
-
-    statusLine.textContent = "Certificate generated successfully.";
-    certMeta.innerText = `Certificate ID: ${certCode}`;
-
-    // render QR to point to verification page (verify.html?code=certCode)
-    const verifyUrl = `${location.origin}/verify.html?code=${encodeURIComponent(certCode)}`;
-    const qrDataUrl = createQRCode(verifyUrl);
-    document.getElementById("certQR").innerHTML = `<img src="${qrDataUrl}" alt="QR">`;
-
-    // show download + email buttons
-    downloadBtn.style.display = "inline-block";
-    emailBtn.style.display = "inline-block";
-    generateBtn.style.display = "none";
-
-  } catch (err) {
-    console.error("Certificate generation failed", err);
-    statusLine.textContent = "Certificate generation failed (see console).";
-    generateBtn.disabled = false;
-  }
-});
-
-downloadBtn.addEventListener("click", async () => {
-  if (!lastPdfDataUrl) {
-    // if not in-memory, attempt to fetch from certificateDoc.pdfUrl
-    if (certificateDoc && certificateDoc.pdfUrl) {
-      window.open(certificateDoc.pdfUrl, "_blank");
-      return;
+        if (res.ok) {
+            alert("Success! Certificate generated, saved, and emailed.");
+            location.reload(); 
+        } else {
+            const result = await res.json();
+            alert("Error: " + (result.message || "Failed to save."));
+            generateBtn.disabled = false;
+            generateBtn.textContent = "Generate Certificate";
+        }
+    } catch (err) {
+        console.error("Generation Error:", err);
+        generateBtn.disabled = false;
+        alert("Failed to capture certificate image.");
     }
-    alert("No certificate PDF available to download.");
-    return;
-  }
-  // create a temporary link
-  const a = document.createElement("a");
-  a.href = lastPdfDataUrl;
-  a.download = `${currentCourseId || 'certificate'}_${currentUser.uid}.pdf`;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-});
+}
 
-emailBtn.addEventListener("click", async () => {
-  // call cloud function to email certificate
-  if (!certificateDoc) { alert("No certificate record found to email."); return; }
-  statusLine.textContent = "Requesting email sending…";
+/**
+ * Resend the certificate email via Backend
+ */
+async function handleEmailResend() {
+    const codeElement = document.getElementById("certCode");
+    const code = codeElement ? codeElement.textContent.trim() : "";
+    const token = localStorage.getItem('token');
+    const emailBtn = document.getElementById("emailBtn");
 
-  try {
-    const functions = getFunctions();
-    const sendCertFn = httpsCallable(functions, 'sendCertificateEmail');
-    const res = await sendCertFn({ certificateId: certificateDoc.certificateCode || certificateDoc.certificateCode, email: currentUser.email, pdfUrl: certificateDoc.pdfUrl || certificateDoc.pdfUrl });
-    if (res.data && res.data.success) {
-      statusLine.textContent = "Email sent successfully.";
-    } else {
-      statusLine.textContent = "Email request sent (check logs).";
+    if (code === "—" || code === "PENDING" || !code) return alert("No valid certificate to send.");
+
+    emailBtn.disabled = true;
+    emailBtn.textContent = "⌛ Sending...";
+
+    try {
+        const res = await fetch(`${API_BASE_URL}/certificates/send-email`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ certificateCode: code })
+        });
+
+        if (res.ok) {
+            alert("Email sent successfully!");
+        } else {
+            const errorData = await res.json();
+            alert("Could not send email: " + (errorData.message || "Unknown error"));
+        }
+    } catch (err) {
+        alert("Server connection failed.");
+    } finally {
+        emailBtn.disabled = false;
+        emailBtn.textContent = "Email Certificate";
     }
-  } catch (err) {
-    console.error("Email function error", err);
-    statusLine.textContent = "Failed to send email (see console).";
-  }
-});
+}
 
-// init
-checkEligibilityAndLoad();
+/**
+ * High-quality download for the student
+ */
+async function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    const element = document.getElementById("certificateCanvas");
+    const canvas = await html2canvas(element, { scale: 2 }); 
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF("l", "px", [800, 600]);
+    pdf.addImage(imgData, "PNG", 0, 0, 800, 600);
+    const code = document.getElementById("certCode").textContent;
+    pdf.save(`Certificate-${code}.pdf`);
+}

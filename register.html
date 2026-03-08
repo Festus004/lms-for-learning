@@ -1,107 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>LMS — Register</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="script.js" defer></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LMS — Register</title>
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <script src="ui.js"></script>
+
+    <style>
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 50px;
+            padding: 40px;
+            min-height: 70vh;
+        }
+        .auth-box {
+            max-width: 350px;
+            width: 100%;
+            background: var(--card);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .animation-box {
+            width: 350px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0 20px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: block;
+        }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn:hover {
+            background-color: #218838;
+        }
+        .muted {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+    </style>
 </head>
+
 <body>
-  
 <nav>
-  <h2 class="logo">LMS FOR LEARNING</h2>
+    <h2 class="logo">LMS FOR LEARNING</h2>
 
-  <div class="nav-links">
-    <a href="index.html">Home</a>
-    <a href="courses.html">Courses</a>
-    <a href="videos.html">Videos</a>
-    <a href="dashboard.html">Dashboard</a>
-    <a href="profile.html">Profile</a>
-    <a href="certificate.html">Certificate</a>
-    <a href="admin.html">Admin</a>
-    <a href="about.html">About</a>
-    <a href="developer.html">Developer</a>
+    <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="courses.html">Courses</a>
+        <a href="videos.html">Videos</a>
+        <a href="login.html">Login</a>
+        <a href="register.html">Sign Up</a>
+        <a href="developer.html">Developer</a>
+        <a href="verify.html">Verification</a>
+    </div>
 
-  </div>
-
-  <div class="nav-actions">
-    <button class="toggle-dark" onclick="toggleDarkMode()" aria-label="Toggle dark mode">🌙</button>
-  </div>
+    <div class="nav-actions">
+        <button class="toggle-dark" onclick="toggleDarkMode()" aria-label="Toggle dark mode">🌙</button>
+    </div>
 </nav>
 
+<main>
+    <div class="auth-container">
 
+        <div class="animation-box">
+            <lottie-player 
+                src="https://assets9.lottiefiles.com/packages/lf20_0yfsb3a1.json"
+                background="transparent" 
+                speed="1" 
+                style="width: 100%; height: 100%;" 
+                loop 
+                autoplay>
+            </lottie-player>
+        </div>
 
-  <main class="auth">
-    <h2>Create Account</h2>
-    <form id="registerForm">
-      <label for="regName">Full Name</label>
-      <input id="regName" type="text" required>
+        <div class="auth-box">
+            <h2>Create Account</h2>
 
-      <label for="regEmail">Email</label>
-      <input id="regEmail" type="email" required>
+            <form id="registerForm">
+                <label for="name">Full Name</label>
+                <input id="name" type="text" placeholder="John Doe" required>
 
-      <label for="regPass">Password</label>
-      <input id="regPass" type="password" required>
+                <label for="email">Email</label>
+                <input id="email" type="email" placeholder="email@example.com" required>
 
-      <button class="btn" type="submit">Register</button>
-      <p class="muted">Already have an account? <a href="login.html">Login</a></p>
-    </form>
-  </main>
-<script type="module" src="firebase.js"></script>
-<script type="module" src="auth.js"></script>
-<script type="module" src="script.js"></script>
+                <label for="password">Password</label>
+                <input id="password" type="password" placeholder="••••••••" required>
 
+                <button class="btn" type="submit">Register</button>
 
+                <p class="muted">Already have an account? <a href="login.html">Login</a></p>
+            </form>
+        </div>
 
+    </div>
+</main>
 
-<script type="module">
-  import { registerUser } from './auth.js';
-  // optionally expose to window for older invoked handlers:
-  window.registerUser = registerUser;
-</script>
-
-
-<script type="module">
-import { auth, db } from "./firebase.js";
-import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-
-const regForm = document.getElementById("registerForm");
-
-regForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const name = document.getElementById("regName").value.trim();
-    const email = document.getElementById("regEmail").value.trim();
-    const pass = document.getElementById("regPass").value;
-
-    try {
-        // Create account in Firebase Auth
-        const userCred = await createUserWithEmailAndPassword(auth, email, pass);
-
-        // Save profile to Firestore
-        await setDoc(doc(db, "users", userCred.user.uid), {
-            name: name,
-            email: email,
-            joined: serverTimestamp(),
-            progress: {},
-            scores: {}
-        });
-
-        alert("Account created successfully!");
-        window.location.href = "dashboard.html";
-    } catch (err) {
-        alert(err.message);
-    }
-});
-</script>
-<script type="module" src="firebase.js"></script>
 <script type="module" src="auth.js"></script>
 
-
+<footer class="site-footer">
+    <p>&copy; 2025 LMS FOR LEARNING | #festuserick4@gmail.com</p>
+</footer>
 
 </body>
-<footer class="site-footer">
-    <p>&copy; 2025 LMS FOR LEARNING #festuserick4@gmail.com</p>
 </html>

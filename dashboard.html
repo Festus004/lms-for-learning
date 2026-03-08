@@ -1,155 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LMS FOR LEARNING – Dashboard</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LMS FOR LEARNING – Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="ui.js"></script> 
 </head>
 
 <body>
 
-<header class="header">
-  <div class="logo">LMS FOR LEARNING</div>
-  <nav>
-     <a href="index.html">Home</a>
-    <a href="dashboard.html">Dashboard</a>
-    <a href="courses.html">Courses</a>
-    <a href="profile.html">Profile</a>
-    <a href="certificate.html">Certificates</a>
-    <a href="#" onclick="logout()">Logout</a>
-  </nav>
-</header>
+<nav>
+    <h2 class="logo">LMS DASHBOARD</h2>
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <a href="admin.html">Admin Panel</a> 
+        <a href="dashboard.html" class="active">Dashboard</a>
+        <a href="courses.html">All Courses</a>
+        <a href="profile.html">Profile</a>
+        <a href="certificate.html">Certificates</a>
+        <a href="#" id="logoutBtn" style="color: #ef4444; font-weight: bold;">Logout</a> 
+        <button class="toggle-dark" onclick="toggleDarkMode()" aria-label="Toggle dark mode">🌙</button>
+    </div>
+</nav>
 
 <section class="dash-hero">
-  <h1>Welcome back, <span id="userDisplay">Learner</span> 👋</h1>
-  <p>Your learning journey continues. Keep improving, keep growing.</p>
+    <h1>Welcome back, <span id="userDisplay">Learner</span> 👋</h1>
+    <p>Your learning journey continues. Keep improving, keep growing.</p>
 </section>
 
-<section class="dashboard-grid">
+<div class="container">
+    <section class="dashboard-grid">
 
-  <!-- CONTINUE COURSE CARD -->
-  <div class="dash-card big-card">
-    <h2>Continue Your Course</h2>
-    <p>Web Development Fundamentals</p>
+        <div class="dash-card big-card" id="continueCourseCard">
+            <h2>Continue Learning</h2>
+            <p id="continueCourseTitle" style="font-weight: 600; color: #0b3d91;">Loading your progress...</p>
 
-    <div class="progress-wrapper">
-      <div class="progress-bar" id="mainProgress"></div>
-    </div>
+            <div class="progress-wrapper" style="margin: 20px 0;">
+                <div class="progress-bar-container" style="background: #e2e8f0; border-radius: 10px; height: 12px; overflow: hidden;"> 
+                    <div class="progress-bar" id="mainProgress" style="width: 0%; height: 100%; background: #10b981; transition: width 0.5s ease;"></div>
+                </div>
+                <p style="margin-top: 10px; font-weight: bold;"><span id="progPercent">0%</span> Complete</p>
+            </div>
 
-    <p><span id="progPercent">0%</span> Complete</p>
+            <button class="btn-primary" id="continueCourseBtn" disabled>Open Course</button>
+        </div>
+        
+        <div class="dash-card big-card">
+            <h2>My Certificates</h2>
+            <p class="small" style="margin-bottom: 15px;">Your earned credentials and downloadable PDFs.</p>
+            <div id="certificates-list" class="cert-list-container">
+                <div class="loading-spinner">Checking for certificates...</div>
+            </div>
+        </div>
 
-    <button class="btn-primary" onclick="window.location.href='courses.html'">Open Course</button>
-  </div>
-  
+        <div class="dash-card">
+            <h2>Claim Certificate</h2>
+            <p>Ready to graduate? Enter your course ID to generate your official document.</p>
+            <button class="btn-green" onclick="window.location.href='certificate.html'">Verify Eligibility</button>
+        </div>
 
-  <!-- CERTIFICATE CARD -->
-  <div class="dash-card">
-    <h2>Earn Your Certificate</h2>
-    <p>Complete the quizzes and reach 100% progress to unlock your certificate.</p>
-    <button class="btn-green" onclick="window.location.href='certificate.html'">View Certificates</button>
-  </div>
+        <div class="dash-card">
+            <h2>Take Final Quiz</h2>
+            <p>Test your skills and increase your course progress once you finish the lessons.</p>
+            <button class="btn-orange" id="dashboardQuizBtn">Take Quiz</button>
+        </div>
 
+        <div class="dash-card big-card">
+            <h2>Available Courses</h2>
+            <div id="courses-list" class="course-list">
+                <div class="loading-spinner">Loading courses...</div>
+            </div>
+        </div>
 
-  <!-- QUIZ CARD -->
-  <div class="dash-card">
-    <h2>Take Final Quiz</h2>
-    <p>Test your skills and increase your course progress.</p>
-    <button class="btn-orange" onclick="window.location.href='#quizSection'">Take Quiz</button>
-  </div>
+        <div class="dash-card big-card">
+            <h2>Announcements</h2>
+            <div id="annList" style="max-height: 300px; overflow-y: auto;">
+                Loading announcements...
+            </div>
+        </div>
 
+    </section>
+</div>
 
-  <!-- RECOMMENDED COURSES -->
-  <div class="dash-card big-card">
-    <h2>Recommended For You</h2>
+<footer style="text-align: center; padding: 40px; color: #64748b; font-size: 0.9rem;">
+    <p>&copy; 2025 LMS FOR LEARNING - Directed by Festus Erick</p>
+</footer>
 
-    <h3>Recommended Courses</h3>
-<div id="recommendedCourses"></div>
-
-    <div class="course-list">
-      <div class="course-item">
-        <h4>Data Structures</h4>
-        <button onclick="window.location.href='courses.html'">Open</button>
-      </div>
-      <div class="course-item">
-        <h4>UI/UX Design Basics</h4>
-        <button onclick="window.location.href='courses.html'">Open</button>
-      </div>
-      <div class="course-item">
-        <h4>Python Programming</h4>
-        <button onclick="window.location.href='courses.html'">Open</button>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- ANNOUNCEMENTS -->
-  <div class="dash-card big-card">
-    <h2>Announcements</h2>
-    <div id="annList"></div>
-  </div>
-
-</section>
-
-
-<!-- QUIZ SECTION -->
-<section id="quizSection" class="dash-quiz-section">
-  <div class="dash-card">
-    <h2>Final Quiz – Web Development</h2>
-
-    <form id="quizWeb">
-      <p><b>1. What does HTML stand for?</b></p>
-      <label><input type="radio" name="q1" value="a"> HyperText Markup Language</label><br>
-      <label><input type="radio" name="q1" value="b"> HighText Machine Learning</label><br>
-
-      <p><b>2. CSS controls?</b></p>
-      <label><input type="radio" name="q2" value="a"> Functionality</label><br>
-      <label><input type="radio" name="q2" value="b"> Styling</label><br>
-
-      <p><b>3. JavaScript is mainly used for?</b></p>
-      <label><input type="radio" name="q3" value="a"> Database</label><br>
-      <label><input type="radio" name="q3" value="c"> Interactivity</label><br>
-
-      <button class="btn-primary" type="submit">Submit Quiz</button>
-    </form>
-
-  </div>
-</section>
-
-<!-- firebase must be first -->
-<script type="module" src="firebase.js"></script>
-
-<!-- auth helper (exports functions & relies on firebase) -->
-<script type="module" src="auth.js"></script>
-
-<!-- core app logic (script.js) must be a module because it contains imports -->
-<script type="module" src="script.js"></script>
-
-<!-- dashboard UI/helpers that use auth+script -->
+<script type="module" src="auth.js"></script> 
 <script type="module" src="dashboard.js"></script>
-
-
-<script type="module">
-import { auth, db } from "./firebase.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-
-onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-        window.location.href = "login.html";
-        return;
-    }
-
-    // Load profile from Firestore
-    const ref = doc(db, "users", user.uid);
-    const snap = await getDoc(ref);
-
-    if (snap.exists()) {
-        document.getElementById("userDisplay").textContent = snap.data().name;
-    }
-});
-</script>
-
 
 </body>
 </html>

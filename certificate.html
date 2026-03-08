@@ -3,14 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Certificate — LMS FOR LEARNING</title>
+  <title>Certificate — NextGen-LMS</title>
+  
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="certificate.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
 </head>
 <body>
   <nav class="top-nav">
     <div class="nav-inner">
-      <h2 class="logo">LMS FOR LEARNING</h2>
+      <h2 class="logo">NextGen-LMS</h2>
       <div class="nav-links">
         <a href="dashboard.html">Dashboard</a>
         <a href="courses.html">Courses</a>
@@ -21,12 +23,12 @@
   <main class="container">
     <section class="cert-intro">
       <h1>Your Certificate</h1>
-      <p id="statusLine">Checking eligibility…</p>
+      <p id="statusLine">Connecting to server...</p>
     </section>
 
     <section class="cert-actions">
-      <div>
-        <button id="generateBtn" class="btn-primary">Generate Certificate (PDF)</button>
+      <div id="actionButtons">
+        <button id="generateBtn" class="btn-primary" style="display:none">Generate Certificate (PDF)</button>
         <button id="downloadBtn" class="btn-secondary" style="display:none">Download PDF</button>
         <button id="emailBtn" class="btn-outline" style="display:none">Email Certificate</button>
       </div>
@@ -35,55 +37,63 @@
 
     <section class="cert-preview-wrap">
       <div id="certPreview" class="cert-preview">
-        <!-- certificate canvas will be rendered here by html2canvas/jsPDF workflow -->
-        <div id="certificateCanvas" class="certificate-canvas" aria-hidden="true">
-          <!-- HTML template used for PDF render -->
+        <div id="certificateCanvas" class="certificate-canvas">
           <div class="cert-inner">
+            <div class="corner-decoration top-left"></div>
+            <div class="corner-decoration top-right"></div>
+            <div class="corner-decoration bottom-left"></div>
+            <div class="corner-decoration bottom-right"></div>
+
             <div class="cert-header">
-              <img src="hero.png" alt="LMS FOR LEARNING" class="cert-logo" />
+              <img src="hero.png" alt="LMS LOGO" class="cert-logo" />
+              <div class="cert-title-gold">OFFICIAL DIPLOMA OF EXCELLENCE</div>
             </div>
+            
             <div class="cert-body">
-              <h2>Certificate of Completion</h2>
-              <p class="cert-sub">This is to certify that</p>
-              <h1 id="certName">Student Name</h1>
-              <p class="cert-sub">has successfully completed the course</p>
-              <h3 id="certCourse">Course Name</h3>
-              <p class="cert-details">Issued on <span id="certDate">DATE</span></p>
-              <div class="cert-id">Certificate ID: <span id="certCode">—</span></div>
+              <h2 class="cert-main-title">CERTIFICATE OF COMPLETION</h2>
+              <p class="cert-sub">This is to officially certify that</p>
+              <h1 id="certName">——</h1>
+              <p class="cert-sub">has successfully demonstrated proficiency and completed</p>
+              <h3 id="certCourse">——</h3>
+              <p class="cert-details">Issued on <span id="certDate">——</span></p>
             </div>
+
             <div class="cert-footer">
-              <div class="signature">
-                <div class="sig-line">_______________________</div>
-                <div class="sig-name">Director, LMS FOR LEARNING</div>
+              <div class="signature-block">
+                <div class="signature-handwritten">Director Signature</div>
+                <div class="sig-line"></div>
+                <div class="sig-name">Director, NextGen-LMS</div>
               </div>
-              <div class="verify-qr" id="certQR">
-                <!-- QR will be rendered here (img) -->
+
+              <div class="qr-vault">
+                <div class="verify-qr" id="certQR"></div>
+                <div class="cert-id-box">
+                   ID: <span id="certCode">—</span>
+                </div>
+              </div>
+
+              <div class="signature-block">
+                <div class="signature-handwritten">Registrar Official</div>
+                <div class="sig-line"></div>
+                <div class="sig-name">Office of the Registrar</div>
               </div>
             </div>
           </div>
         </div>
-        <!-- small message shown when PDF generated -->
-        <div id="previewMessage" class="small"></div>
+        <div id="previewMessage" class="small" style="text-align:center; margin-top:15px;"></div>
       </div>
     </section>
 
-    <section style="margin-top:18px">
-      <p class="small">You can also verify a certificate at <a href="verify.html">Verify Certificate</a>.</p>
+    <section style="margin-top:25px; text-align: center;">
+      <p class="small">Public verification available at <a href="verify.html">Verify Credential</a>.</p>
     </section>
-
   </main>
 
-  <footer class="site-footer">© 2025 LMS FOR LEARNING</footer>
+  <footer class="site-footer">© 2026 NextGen-LMS Project</footer>
 
-  <!-- scripts: order matters -->
-  <script type="module" src="firebase.js"></script>
-  <script type="module" src="auth.js"></script>
-
-  <!-- libs for PDF generation & QR (CDN) -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
-
-  <script type="module" src="certificate.js"></script>
+  <script src="certificate.js"></script>
 </body>
 </html>
