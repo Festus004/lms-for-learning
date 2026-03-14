@@ -8,45 +8,64 @@ const courseRoutes = require('./routes/courses');
 const certificateRoutes = require('./routes/certificates');
 const progressRoutes = require('./routes/progress');
 const announcementRoutes = require('./routes/announcements'); 
-// ADDED: Import the missing users routes
 const userRoutes = require('./routes/users'); 
 
 const app = express();
 const PORT = process.env.PORT || 5001;
 const mongoURI = process.env.MONGO_URI; 
 
-// MIDDLEWARE - Set limits BEFORE routes
+// 1. MIDDLEWARE
 app.use(express.json({ limit: '50mb' })); 
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// UPDATED: Allow all origins (*) for the initial launch so you don't get blocked
+// 2. UPDATED CORS: This allows your Netlify site to talk to this server
+const allowedOrigins = [
+    'http://127.0.0.1:5500', 
+    'http://127.0.0.1:5501', 
+    'http://localhost:5500', 
+    'http://localhost:5501',
+    'https://lms-final-prod.onrender.com',
+    'https://meek-chebakia-d3053c.netlify.app' // Your Netlify Link
+];
+
 app.use(cors({
-    origin: '*', 
-    credentials: true
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps) or if it's in our allowed list
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('CORS Policy: This origin is not allowed.'));
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// API ROUTES
+// Handle Preflight OPTIONS requests (Fixes the "Preflight" error)
+app.options('*', cors());
+
+// 3. API ROUTES
 app.use('/api/auth', authRoutes); 
 app.use('/api/courses', courseRoutes); 
 app.use('/api/certificates', certificateRoutes);
 app.use('/api/progress', progressRoutes);
 app.use('/api/announcements', announcementRoutes); 
-// ADDED: Register the user routes under /api/users
 app.use('/api/users', userRoutes); 
 
-app.get('/', (req, res) => res.send('LMS Backend Operational!'));
+// Root path for health check
+app.get('/', (req, res) => res.send('NextGen-LMS Backend Operational!'));
 
-// DB CONNECTION & SERVER START
+// 4. DB CONNECTION & SERVER START
 mongoose.connect(mongoURI)
     .then(() => {
         console.log('✅ MongoDB Connected');
-        // Port is dynamic for Render/Cloud hosting
         app.listen(PORT, () => {
-            console.log(`🚀 Server running on Port: ${PORT}`);
-            console.log(`📜 Certificate Verification service is active.`);
+            console.log(`🚀 NextGen-LMS Server running on Port: ${PORT}`);
+            console.log(`📡 Production Link: https://meek-chebakia-d3053c.netlify.app`);
         });
     })
     .catch(err => {
         console.error('❌ MongoDB Connection Error:', err.message);
-        process.exit(1); // Stop the process if DB fails
+        process.exit(1);
     });
